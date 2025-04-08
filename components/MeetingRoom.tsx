@@ -11,7 +11,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList, MessageSquare, Mic } from 'lucide-react';
+import { Users, LayoutList, MessageSquare } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -26,13 +26,13 @@ import { cn } from '@/lib/utils';
 import { ChatComponent } from './Chat';
 
 import LiveCaptions from './LiveCaptions';
-import useSpeechRecognition from '@/hooks/useSpeechRecognition';
+
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
-//why use !! marks
-//'personal' => !'personal' => false => !false => true
-//undefined => !undefined =? true => false
+// why use !! marks
+// 'personal' => !'personal' => false => !false => true
+// undefined => !undefined =? true => false
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get('personal');
@@ -41,7 +41,6 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const [showChat, setShowChat] = useState(false)
-  // const [showCaptions, setShowCaptions] = useState(false); // State for captions
   const [startCaptions, setStartCaptions] = useState(false);
   const call = useCall();
   // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel

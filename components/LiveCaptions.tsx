@@ -11,14 +11,12 @@ declare global {
 
 const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
   const [captions, setCaptions] = useState<string[]>([]);
-  const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const captionsContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const isRecognizing = useRef(false);
 
-  const maxWords = 10;
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition =
@@ -180,37 +178,6 @@ const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
         )}
     </div>
 
-    // <div className="fixed bottom-0 w-full bg-transparent px-4 py-2">
-    //   {transcript && (
-    //     <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black">
-    //       <p>{transcript}</p>
-    //     </div>
-    //   )}
-
-    //   {error && (
-    //     <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-red-500 bg-opacity-70 p-2 rounded-md bg-black">
-    //       <p>{error}</p>
-    //     </div>
-    //   )}
-    // </div>
-
-
-
-
-    // <div className="p-4 bg-gray-900 text-white rounded-lg">
-      
-    //   <button
-    //     className={`px-4 py-2 rounded ${listening ? 'bg-red-600' : 'bg-green-600'}`}
-    //     onClick={toggleListening}
-    //   >
-    //     {listening ? 'Stop Captions' : 'Start Captions'}
-    //   </button>
-    //   {transcript && (
-    //     <div className="absolute mb-16 bottom-2 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black">
-    //       <p>{transcript}</p>
-    //     </div>
-    //   )}
-    // </div>
   );
 };
 

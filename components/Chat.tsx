@@ -1,18 +1,13 @@
 'use client';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useCreateChatClient, Chat, Channel, MessageInput, MessageList } from 'stream-chat-react';
+import { Chat, Channel, MessageInput, MessageList } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
-
-const API_KEY = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 import { tokenProvider } from '@/actions/stream.actions';
-import {type StreamChatClient } from '@stream-io/node-sdk';
-import { toast } from './ui/use-toast';
 import { useGetCallById } from '@/hooks/useGetCallById';
 import { StreamChat } from 'stream-chat';
-// import { StreamChat } from '@stream-io/stream-chat';
-import Loader from './Loader';
 
+const API_KEY = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 
 interface ChatComponentProps {
   callId: string | string[]; // Ensure you properly type this as `string | string[]`
@@ -20,7 +15,7 @@ interface ChatComponentProps {
 
 export const ChatComponent = ({ callId }: ChatComponentProps) => {
     const { user, isLoaded } = useUser();
-    const { call } = useGetCallById(callId);
+    // const { call } = useGetCallById(callId);
     const [chatClient, setChatClient] = useState<StreamChat | null>(null);
     useEffect(() => {
         if (!isLoaded || !user) return;
@@ -29,16 +24,6 @@ export const ChatComponent = ({ callId }: ChatComponentProps) => {
         const initChat = async () => {
           try {
             const client = StreamChat.getInstance(API_KEY);
-            // const client = useCreateChatClient({
-            //   apiKey: API_KEY,
-            //   tokenOrProvider:tokenProvider,
-
-            //     userData: {
-            //         id: user?.id,
-            //         name: user?.username || user?.id,
-            //         image: user?.imageUrl,
-            //     },
-            // });
 
             await client.connectUser(
              {
@@ -52,8 +37,6 @@ export const ChatComponent = ({ callId }: ChatComponentProps) => {
             setChatClient(client);
           } catch (error) {
             console.error('Failed to initialize chat:', error);
-            // Handle error (show error message, etc.)
-            // toast("Message failed to load");
           } 
         };
 
