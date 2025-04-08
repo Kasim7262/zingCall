@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-
 // Fix: Declare global types for Web Speech API
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
   }
+
+  
 }
 
 const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
@@ -121,28 +122,7 @@ const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
     }
   };
 
-  // const toggleListening = () => {
-  //   if (!recognitionRef.current) return;
-  //   if (listening) {
-  //     recognitionRef.current.stop();
-  //   } else {
-  //     recognitionRef.current.start();
-  //   }
-  //   setListening(!listening);
-  // };
-
-
   useEffect(() => {
-    // if (startCaptions) {
-    //   if (!isRecognizing.current) {
-    //     // Start recognition only if it's not already in progress
-    //     recognitionRef.current?.start();
-    //     isRecognizing.current = true; // Set recognizing state to true
-    //   }
-    // } else {
-    //   recognitionRef.current?.stop(); // Stop speech recognition when the toggle is off
-    //   isRecognizing.current = false; 
-    // }
 
     if (startCaptions) {
       startRecognition(); // Start recognition when captions are enabled
@@ -153,14 +133,14 @@ const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
 
   return (
 
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full text-white px-4 py-2">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full text-white px-4 py-2">
       {/* Render captions */}
         {/* <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black w-full max-w-[90%]"> */}
         <div ref={captionsContainerRef} className="overflow-y-auto max-w-[90%] text-left bg-transparent z-20">
           {captions.map((caption, index) => (
             <div
               key={index}
-              className="caption-item mb-20 opacity-100 transition-opacity duration-500 ease-in-out text-white"
+              className="mb-20 opacity-100 transition-opacity duration-500 ease-in-out"
               style={{
                 animation: `fadeInOut 6s ease-out forwards`,
                 animationDelay: `${index * 2}s`, // Delay each caption by 2s
@@ -172,7 +152,7 @@ const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
         </div>
         {/* Display errors if any */}
         {error && (
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-red-500 bg-opacity-70 p-2 rounded-md bg-black">
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-red-500 bg-black/70 p-2 rounded-md ">
             <p>{error}</p>
           </div>
         )}

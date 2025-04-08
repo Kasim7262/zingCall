@@ -19,6 +19,7 @@ const config = {
     },
     extend: {
       colors: {
+        destructive: '#e63946',
         dark: {
           1: '#1C1F2E',
           2: '#161925',

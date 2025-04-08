@@ -4,7 +4,6 @@ import { useUser } from '@clerk/nextjs';
 import { Chat, Channel, MessageInput, MessageList } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import { tokenProvider } from '@/actions/stream.actions';
-import { useGetCallById } from '@/hooks/useGetCallById';
 import { StreamChat } from 'stream-chat';
 
 const API_KEY = process.env.NEXT_PUBLIC_STREAM_API_KEY;
@@ -15,7 +14,6 @@ interface ChatComponentProps {
 
 export const ChatComponent = ({ callId }: ChatComponentProps) => {
     const { user, isLoaded } = useUser();
-    // const { call } = useGetCallById(callId);
     const [chatClient, setChatClient] = useState<StreamChat | null>(null);
     useEffect(() => {
         if (!isLoaded || !user) return;
@@ -65,15 +63,15 @@ export const ChatComponent = ({ callId }: ChatComponentProps) => {
   }
 
   return (
-    <div className="h-full w-80 bg-dark-2 text-white rounded-lg overflow-hidden flex flex-col mb-12">
+    <div className="mb-12 h-full w-80 flex flex-col overflow-hidden rounded-lg bg-dark-2 text-white">
       <Chat client={chatClient}>
         <Channel channel={channel}>
           <div className='flex flex-col justify-between rounded-lg'>
-            <div className="flex flex-col overflow-auto rounded-t-lg">
+            <div className="flex flex-col rounded-t-lg overflow-auto ">
               <MessageList />
               
             </div>
-            <div className="p-2 rounded-b-lg">
+            <div className="rounded-b-lg p-2">
               <MessageInput />
             </div>
           </div>
