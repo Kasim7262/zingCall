@@ -1,0 +1,217 @@
+'use client';
+import { useState, useEffect, useRef } from 'react';
+
+// Fix: Declare global types for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
+const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
+  const [captions, setCaptions] = useState<string[]>([]);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const captionsContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
+  const isRecognizing = useRef(false);
+
+  const maxWords = 10;
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+        let finalTranscript = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript.trim() + ' ';
+          }
+        }
+
+        if (finalTranscript.length > 0) {
+          setCaptions([finalTranscript.trim()]); // Keeps only the latest caption
+        }
+      };
+
+      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      //   setTranscript((prev) => prev + ' ' + event.results[event.results.length - 1][0].transcript);
+      // };
+
+      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      //   const finalTranscript = event.results[0][0].transcript;
+      //   setTranscript(finalTranscript); // Set only the final transcript
+      //   // recognitionRef.current?.stop(); // Stop the recognition after capturing the speech
+      // };
+
+      // recognitionRef.current.onerror = (event) => {
+      //   console.error('Speech recognition error:', event);
+      // };
+
+      // recognitionRef.current.onstart = () => {
+      //   isRecognizing.current = true; // Mark recognition as started
+      //   console.log('Speech recognition started.');
+      // };
+
+
+      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      //   const finalTranscript = event.results[0][0].transcript;
+
+      //   // Add the new caption to the list
+      //   setCaptions((prevCaptions) => {
+      //     const newCaptions = [...prevCaptions, finalTranscript];
+
+      //     // Keep only the latest captions within the word limit
+      //     const allWords = newCaptions.join(' ').split(' '); // Split by words
+      //     if (allWords.length > maxWords) {
+      //       allWords.splice(0, allWords.length - maxWords); // Remove older words if over maxWords
+      //     }
+
+      //     return allWords.join(' ').match(/.{1,30}(\s|$)/g) || []; // Split into 30 char chunks
+      //   });
+      // };
+
+      // recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+      //   if (event.error === 'no-speech') {
+      //     setError('No speech detected. Please try speaking again.');
+      //   } else if (event.error === 'aborted') {
+      //     setError('Speech recognition was aborted.');
+      //   } else {
+      //     setError('An unknown error occurred.');
+      //   }
+      //   console.error('Speech recognition error:', event);
+      // };
+
+      // recognitionRef.current.onend = () => {
+      //   if (isRecognizing.current) {
+      //     // Only restart if recognition was active
+      //     if (startCaptions) {
+      //       console.log('Restarting speech recognition...');
+      //       recognitionRef.current?.start();
+      //     }
+      //   }
+      // };
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event);
+      };
+    } else {
+      console.error('Speech recognition is not supported in this browser.');
+    }
+  }, []);
+
+
+  const startRecognition = () => {
+    if (recognitionRef.current && !isRecognizing.current) {
+      console.log('Starting speech recognition...');
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopRecognition = () => {
+    if (recognitionRef.current && isRecognizing.current) {
+      console.log('Stopping speech recognition...');
+      recognitionRef.current.stop();
+    }
+  };
+
+  // const toggleListening = () => {
+  //   if (!recognitionRef.current) return;
+  //   if (listening) {
+  //     recognitionRef.current.stop();
+  //   } else {
+  //     recognitionRef.current.start();
+  //   }
+  //   setListening(!listening);
+  // };
+
+
+  useEffect(() => {
+    // if (startCaptions) {
+    //   if (!isRecognizing.current) {
+    //     // Start recognition only if it's not already in progress
+    //     recognitionRef.current?.start();
+    //     isRecognizing.current = true; // Set recognizing state to true
+    //   }
+    // } else {
+    //   recognitionRef.current?.stop(); // Stop speech recognition when the toggle is off
+    //   isRecognizing.current = false; 
+    // }
+
+    if (startCaptions) {
+      startRecognition(); // Start recognition when captions are enabled
+    } else {
+      stopRecognition(); // Stop recognition when captions are disabled
+    }
+  }, [startCaptions]);
+
+  return (
+
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full text-white px-4 py-2">
+      {/* Render captions */}
+        {/* <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black w-full max-w-[90%]"> */}
+        <div ref={captionsContainerRef} className="overflow-y-auto max-w-[90%] text-left bg-transparent z-20">
+          {captions.map((caption, index) => (
+            <div
+              key={index}
+              className="caption-item mb-20 opacity-100 transition-opacity duration-500 ease-in-out text-white"
+              style={{
+                animation: `fadeInOut 6s ease-out forwards`,
+                animationDelay: `${index * 2}s`, // Delay each caption by 2s
+              }}
+            >
+              <p className='mb-2'>{caption}</p>
+            </div>
+          ))}
+        </div>
+        {/* Display errors if any */}
+        {error && (
+          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-red-500 bg-opacity-70 p-2 rounded-md bg-black">
+            <p>{error}</p>
+          </div>
+        )}
+    </div>
+
+    // <div className="fixed bottom-0 w-full bg-transparent px-4 py-2">
+    //   {transcript && (
+    //     <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black">
+    //       <p>{transcript}</p>
+    //     </div>
+    //   )}
+
+    //   {error && (
+    //     <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-red-500 bg-opacity-70 p-2 rounded-md bg-black">
+    //       <p>{error}</p>
+    //     </div>
+    //   )}
+    // </div>
+
+
+
+
+    // <div className="p-4 bg-gray-900 text-white rounded-lg">
+      
+    //   <button
+    //     className={`px-4 py-2 rounded ${listening ? 'bg-red-600' : 'bg-green-600'}`}
+    //     onClick={toggleListening}
+    //   >
+    //     {listening ? 'Stop Captions' : 'Start Captions'}
+    //   </button>
+    //   {transcript && (
+    //     <div className="absolute mb-16 bottom-2 left-1/2 transform -translate-x-1/2 text-white bg-opacity-70 p-2 rounded-md bg-black">
+    //       <p>{transcript}</p>
+    //     </div>
+    //   )}
+    // </div>
+  );
+};
+
+export default LiveCaptions;

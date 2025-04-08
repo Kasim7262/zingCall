@@ -9,7 +9,8 @@ import { tokenProvider } from '@/actions/stream.actions';
 import {type StreamChatClient } from '@stream-io/node-sdk';
 import { toast } from './ui/use-toast';
 import { useGetCallById } from '@/hooks/useGetCallById';
-import type { StreamChat } from 'stream-chat';
+import { StreamChat } from 'stream-chat';
+// import { StreamChat } from '@stream-io/stream-chat';
 import Loader from './Loader';
 
 
@@ -27,38 +28,71 @@ export const ChatComponent = ({ callId }: ChatComponentProps) => {
         
         const initChat = async () => {
           try {
-            
-            const client = useCreateChatClient({
-              apiKey: API_KEY,
-              tokenOrProvider:tokenProvider,
+            const client = StreamChat.getInstance(API_KEY);
+            // const client = useCreateChatClient({
+            //   apiKey: API_KEY,
+            //   tokenOrProvider:tokenProvider,
 
-                userData: {
-                    id: user?.id,
-                    name: user?.username || user?.id,
-                    image: user?.imageUrl,
-                },
-            });
+            //     userData: {
+            //         id: user?.id,
+            //         name: user?.username || user?.id,
+            //         image: user?.imageUrl,
+            //     },
+            // });
+
+            await client.connectUser(
+             {
+              id:user?.id,
+              name:user?.username || user?.id,
+              image:user?.imageUrl,
+             },
+             tokenProvider,
+            );
     
             setChatClient(client);
           } catch (error) {
             console.error('Failed to initialize chat:', error);
             // Handle error (show error message, etc.)
             // toast("Message failed to load");
-          }
+          } 
         };
-        initChat();
-    }, [isLoaded, user]);
-  if (!chatClient) return <Loader/>;
+
+
+        if (callId) {
+          initChat();
+        } else {
+          console.log('Missing or invalid Call ID');
+          // setIsLoading(false);
+        }
+    }, [callId, isLoaded, user]);
+  // if (!chatClient) return <Loader/>;
+  if (!chatClient) {
+    console.error("Chat client is not initialized!");
+    return null; // Or render a loading state
+  }
+
+
+  if (!callId) {
+    return <div>Invalid Call ID</div>;
+  }
+  
+  const channel = chatClient.channel('livestream', `meeting-${callId}`);
+  if (!channel) {
+    return <div>Failed to load chat channel</div>;
+  }
 
   return (
-    <div className="h-full w-80 bg-dark-2 rounded-lg overflow-hidden flex flex-col">
+    <div className="h-full w-80 bg-dark-2 text-white rounded-lg overflow-hidden flex flex-col mb-12">
       <Chat client={chatClient}>
-        <Channel channel={chatClient.channel('livestream', `meeting-${callId}`)}>
-          <div className="flex-1 overflow-hidden">
-            <MessageList />
-          </div>
-          <div className="p-2">
-            <MessageInput />
+        <Channel channel={channel}>
+          <div className='flex flex-col justify-between rounded-lg'>
+            <div className="flex flex-col overflow-auto rounded-t-lg">
+              <MessageList />
+              
+            </div>
+            <div className="p-2 rounded-b-lg">
+              <MessageInput />
+            </div>
           </div>
         </Channel>
       </Chat>
