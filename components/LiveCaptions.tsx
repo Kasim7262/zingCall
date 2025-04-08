@@ -41,64 +41,8 @@ const LiveCaptions = ({ startCaptions }: { startCaptions: boolean }) => {
           setCaptions([finalTranscript.trim()]); // Keeps only the latest caption
         }
       };
-
-      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      //   setTranscript((prev) => prev + ' ' + event.results[event.results.length - 1][0].transcript);
-      // };
-
-      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      //   const finalTranscript = event.results[0][0].transcript;
-      //   setTranscript(finalTranscript); // Set only the final transcript
-      //   // recognitionRef.current?.stop(); // Stop the recognition after capturing the speech
-      // };
-
-      // recognitionRef.current.onerror = (event) => {
-      //   console.error('Speech recognition error:', event);
-      // };
-
-      // recognitionRef.current.onstart = () => {
-      //   isRecognizing.current = true; // Mark recognition as started
-      //   console.log('Speech recognition started.');
-      // };
-
-
-      // recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      //   const finalTranscript = event.results[0][0].transcript;
-
-      //   // Add the new caption to the list
-      //   setCaptions((prevCaptions) => {
-      //     const newCaptions = [...prevCaptions, finalTranscript];
-
-      //     // Keep only the latest captions within the word limit
-      //     const allWords = newCaptions.join(' ').split(' '); // Split by words
-      //     if (allWords.length > maxWords) {
-      //       allWords.splice(0, allWords.length - maxWords); // Remove older words if over maxWords
-      //     }
-
-      //     return allWords.join(' ').match(/.{1,30}(\s|$)/g) || []; // Split into 30 char chunks
-      //   });
-      // };
-
-      // recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-      //   if (event.error === 'no-speech') {
-      //     setError('No speech detected. Please try speaking again.');
-      //   } else if (event.error === 'aborted') {
-      //     setError('Speech recognition was aborted.');
-      //   } else {
-      //     setError('An unknown error occurred.');
-      //   }
-      //   console.error('Speech recognition error:', event);
-      // };
-
-      // recognitionRef.current.onend = () => {
-      //   if (isRecognizing.current) {
-      //     // Only restart if recognition was active
-      //     if (startCaptions) {
-      //       console.log('Restarting speech recognition...');
-      //       recognitionRef.current?.start();
-      //     }
-      //   }
-      // };
+      
+     
       recognitionRef.current.onerror = (event) => {
         console.error('Speech recognition error:', event);
       };
